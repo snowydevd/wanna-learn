@@ -1,0 +1,16 @@
+{
+  "name": "want-to-learn-local",
+  "description": "Marketplace local para probar want-to-learn",
+  "owner": {
+    "name": "Lautaro Chinikiba",
+    "email": "lautarochinikiba@gmail.com"
+  },
+  "plugins": [
+    {
+      "name": "want-to-learn",
+      "description": "Modo aprendizaje: Claude arma una guía paso a paso y vos escribís el código.",
+      "version": "0.1.0",
+      "source": "./"
+    }
+  ]
+}
