@@ -77,12 +77,12 @@ export class Tutor {
       const r = await this.runner(generateRequest(pedido));
       if (!r.ok) return r;
       const d: any = r.data;
-      if (!d || !isStr(d.titulo) || !Array.isArray(d.pasos) || d.pasos.length === 0) {
+      if (!d || !isStr(d.titulo) || !Array.isArray(d.pasos) || !d.pasos.some((p: any) => p?.tipo !== "crear-archivo")) {
         return { ok: false, error: "Claude no devolvió una guía válida. Probá de nuevo." };
       }
-      const raw: Paso[] = d.pasos.map((p: any) => ({
+      const raw: Paso[] = d.pasos.filter((p: any) => p?.tipo !== "crear-archivo").map((p: any) => ({
         id: 0,
-        tipo: p.tipo === "crear-archivo" ? "crear-archivo" : "codigo",
+        tipo: "codigo" as const,
         titulo: String(p.titulo ?? ""),
         archivo: String(p.archivo ?? ""),
         donde: String(p.donde ?? ""),

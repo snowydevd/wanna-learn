@@ -10,8 +10,50 @@
     "vscode": "^1.90.0"
   },
   "main": "./dist/extension.js",
-  "activationEvents": [],
-  "contributes": {},
+  "activationEvents": [
+    "onView:wantToLearn.panel"
+  ],
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "wantToLearn",
+          "title": "Want to learn",
+          "icon": "media/icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "wantToLearn": [
+        {
+          "type": "webview",
+          "id": "wantToLearn.panel",
+          "name": "Guía"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Want to learn",
+      "properties": {
+        "wantToLearn.claudePath": {
+          "type": "string",
+          "default": "claude",
+          "description": "Ruta o nombre del ejecutable de Claude Code."
+        },
+        "wantToLearn.model": {
+          "type": "string",
+          "default": "",
+          "description": "Modelo para Claude (vacío = el default del CLI)."
+        },
+        "wantToLearn.timeoutSeconds": {
+          "type": "number",
+          "default": 300,
+          "minimum": 30,
+          "description": "Tiempo máximo de espera por respuesta de Claude."
+        }
+      }
+    }
+  },
   "scripts": {
     "build": "node esbuild.mjs",
     "test": "vitest run",
@@ -25,5 +67,9 @@
     "esbuild": "^0.28.2",
     "typescript": "^7.0.2",
     "vitest": "^5.1.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "local"
   }
 }

@@ -20,6 +20,7 @@ describe("loadRules", () => {
     const r = loadRules(skillsDir);
     expect(r).toContain("No edites ni crees archivos");
     expect(r).toContain("JSON");
+    expect(r).toContain("Revisar mi código");
   });
 });
 
@@ -28,6 +29,8 @@ describe("requests", () => {
     const r = generateRequest("subir fotos");
     expect(r.prompt).toContain("subir fotos");
     expect((r.schema as any).required).toContain("pasos");
+    expect(r.prompt).toContain("No incluyas pasos de crear archivo");
+    expect((r.schema as any).properties.pasos.items.properties.tipo.enum).toEqual(["codigo"]);
   });
   it("hintRequest solo usa el paso actual", () => {
     const g = guia();
@@ -36,6 +39,7 @@ describe("requests", () => {
     expect(r.prompt).toContain("OBJ-1");
     for (const p of g.pasos[0].pistas) expect(r.prompt).toContain(p);
     expect(r.prompt).toContain("nivel 2");
+    expect(r.prompt).toContain("Nivel 1: no nombres funciones ni APIs");
     expect(r.prompt).not.toContain("OBJ-2");
     expect((r.schema as any).required).toEqual(["pista"]);
   });

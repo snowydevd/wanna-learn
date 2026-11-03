@@ -13,6 +13,7 @@ const EXTENSION_NOTE = `
 - Las rutas de archivo siempre son relativas a la raíz del workspace (tu directorio actual).
 - Si existe CLAUDE.md en la raíz, leelo para conocer las convenciones del proyecto.
 - Escribí en español.
+- El usuario no usa comandos: en lugar de /check y /hint tiene los botones "✓ Revisar mi código" y "💡 Pista" del panel. Si hace falta mencionarlos, nombrá los botones.
 `;
 
 export function extractSection(md: string, heading: string): string {
@@ -35,7 +36,7 @@ const strArr = { type: "array", items: str };
 const pasoSchema = {
   type: "object",
   properties: {
-    tipo: { type: "string", enum: ["crear-archivo", "codigo"] },
+    tipo: { type: "string", enum: ["codigo"] },
     titulo: str,
     archivo: str,
     donde: str,
@@ -67,7 +68,7 @@ Cada paso:
 - "criterios": lo que la revisión va a verificar (privado),
 - "pistas": exactamente 3, de suave a fuerte (1: por dónde empezar; 2: qué API o estructura usar; 3: el esqueleto en palabras), sin código resuelto.
 
-Si un archivo no existe todavía, incluí antes un paso con "tipo": "crear-archivo" para ese archivo. Ordená los pasos para que cada uno se apoye en el anterior (normalmente 3 a 8 pasos).
+No incluyas pasos de crear archivo: si un paso usa un archivo que todavía no existe, la extensión agrega antes un paso que lo crea vacío. Todo lo que hay que escribir en ese archivo (incluidos los imports) va en pasos "tipo": "codigo". Ordená los pasos para que cada uno se apoye en el anterior (normalmente 3 a 8 pasos).
 
 Devolvé "titulo" (corto), "panorama" (2 a 4 líneas: qué vamos a construir y cómo encajan las piezas) y "pasos".`;
   return {
@@ -94,6 +95,11 @@ Pistas preparadas para este paso:
 ${p.pistas.map((x, i) => `${i + 1}. ${x}`).join("\n")}
 
 El usuario pidió una pista de nivel ${nivel} (1 suave, 2 media, 3 fuerte).${p.ultimaPista ? `\nÚltima pista que recibió: ${p.ultimaPista}` : ""}
+
+Cuánto revelar según el nivel:
+- Nivel 1: no nombres funciones ni APIs; orientá sobre qué pensar o dónde mirar en el código existente.
+- Nivel 2: nombrá qué API, función o estructura usar.
+- Nivel 3: describí el esqueleto en palabras.
 
 Leé ${p.archivo} para ver lo que ya escribió y adaptá la pista de nivel ${nivel} a dónde está: no repitas lo que ya resolvió. Nunca escribas el código resuelto del paso; como mucho una línea de sintaxis genérica. Devolvé "pista".`;
   return { prompt, schema: { type: "object", properties: { pista: str }, required: ["pista"] } };

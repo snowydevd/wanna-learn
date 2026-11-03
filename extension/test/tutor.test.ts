@@ -50,6 +50,14 @@ describe("Tutor.generate", () => {
     expect(r.ok).toBe(false);
     expect(existsSync(t.guidePath)).toBe(false);
   });
+  it("descarta los crear-archivo de Claude y usa los estándar", async () => {
+    const d = genData();
+    d.pasos.unshift({ tipo: "crear-archivo", titulo: "Crear con imports", archivo: "src/nuevo.ts", donde: "x", objetivo: "con imports", conceptos: [], criterios: ["importa X"], pistas: ["1", "2", "3"] });
+    const r = await new Tutor(root, okRunner(d), noSave).generate("x");
+    expect(r.ok && r.guia.pasos.map((p) => p.tipo)).toEqual(["crear-archivo", "codigo"]);
+    expect(r.ok && r.guia.pasos[0].criterios).toEqual([]);
+    expect(r.ok && r.guia.pasos[0].objetivo).toBe("Crear el archivo vacío src/nuevo.ts");
+  });
   it("rechaza respuesta sin pasos", async () => {
     const t = new Tutor(root, okRunner({ titulo: "T" }), noSave);
     expect((await t.generate("x")).ok).toBe(false);
