@@ -1,0 +1,29 @@
+{
+  "name": "want-to-learn",
+  "displayName": "Want to learn",
+  "description": "Guías paso a paso con Claude: vos escribís el código, Claude explica, da pistas y revisa.",
+  "version": "0.1.0",
+  "publisher": "local",
+  "license": "MIT",
+  "private": true,
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "main": "./dist/extension.js",
+  "activationEvents": [],
+  "contributes": {},
+  "scripts": {
+    "build": "node esbuild.mjs",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "package": "npm run build && vsce package --no-dependencies"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.5",
+    "@types/vscode": "1.90",
+    "@vscode/vsce": "^4.1.0",
+    "esbuild": "^0.28.2",
+    "typescript": "^7.0.2",
+    "vitest": "^5.1.0"
+  }
+}
