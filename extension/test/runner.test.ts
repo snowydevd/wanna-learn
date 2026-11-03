@@ -78,3 +78,13 @@ describe("runClaude", () => {
     expect(seen).toEqual({ cmd: "claude", cwd: "/w" });
   });
 });
+
+import { resolveClaudePath } from "../src/claude/runner";
+describe("resolveClaudePath", () => {
+  it("usa ~/.local/bin/claude si el setting es el default y existe", () => {
+    expect(resolveClaudePath("claude", "/h", (p) => p === "/h/.local/bin/claude")).toBe("/h/.local/bin/claude");
+    expect(resolveClaudePath("claude", "/h", () => false)).toBe("claude");
+    expect(resolveClaudePath("/opt/claude", "/h", () => true)).toBe("/opt/claude");
+    expect(resolveClaudePath("", "/h", () => false)).toBe("claude");
+  });
+});

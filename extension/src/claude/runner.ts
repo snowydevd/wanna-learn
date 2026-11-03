@@ -97,3 +97,11 @@ export function runClaude(o: RunOptions, spawn: SpawnFn = defaultSpawn): Promise
     });
   });
 }
+
+/** Con el setting por defecto, prefiere ~/.local/bin/claude (VS Code abierto desde el escritorio puede no tenerlo en PATH). */
+export function resolveClaudePath(setting: string, home: string, exists: (p: string) => boolean): string {
+  const s = setting.trim() || "claude";
+  if (s !== "claude") return s;
+  const local = `${home}/.local/bin/claude`;
+  return exists(local) ? local : s;
+}

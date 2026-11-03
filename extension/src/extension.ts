@@ -1,9 +1,11 @@
 import * as vscode from "vscode";
 import * as path from "node:path";
 import { Tutor, type Result } from "./tutor";
-import { runClaude } from "./claude/runner";
+import { resolveClaudePath, runClaude } from "./claude/runner";
+import { existsSync } from "node:fs";
+import { homedir } from "node:os";
 import { loadRules } from "./claude/prompts";
-import { currentStep, resolveInWorkspace } from "./guide/progress";
+import { currentStep, isPendingCreate, resolveInWorkspace } from "./guide/progress";
 import { clampLine, resolveAnchor } from "./anchor";
 import type { Guia } from "./guide/types";
 import type { ViewState } from "./webview/render";
@@ -44,7 +46,7 @@ export function activate(context: vscode.ExtensionContext): void {
             cwd: root,
             model: cfg.get<string>("model") || undefined,
             timeoutMs: (cfg.get<number>("timeoutSeconds") ?? 300) * 1000,
-            claudePath: cfg.get<string>("claudePath") || "claude",
+            claudePath: resolveClaudePath(cfg.get<string>("claudePath") ?? "claude", homedir(), existsSync),
           });
         },
         async () => {
@@ -196,8 +198,8 @@ export function activate(context: vscode.ExtensionContext): void {
     guideWatcher.onDidCreate(onGuide);
     guideWatcher.onDidDelete(onGuide);
     const fileWatcher = vscode.workspace.createFileSystemWatcher(new vscode.RelativePattern(root, "**/*"), false, true, true);
-    fileWatcher.onDidCreate(async () => {
-      if (busy || generating !== null) return;
+    fileWatcher.onDidCreate(async (uri) => {
+      if (busy || generating !== null || !isPendingCreate(guia, root, uri.fsPath)) return;
       if (await tutor.syncCreatedFile()) await refresh();
     });
     context.subscriptions.push(

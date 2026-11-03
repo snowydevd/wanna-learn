@@ -69,3 +69,10 @@ export function resolveInWorkspace(root: string, rel: string): string | null {
   if (!fromRoot || fromRoot.startsWith("..") || path.isAbsolute(fromRoot)) return null;
   return abs;
 }
+
+/** ¿El archivo recién creado es el que pide el paso crear-archivo actual? */
+export function isPendingCreate(g: Guia | undefined, root: string, absPath: string): boolean {
+  const p = g && currentStep(g);
+  if (!p || p.tipo !== "crear-archivo") return false;
+  return resolveInWorkspace(root, p.archivo) === path.resolve(absPath);
+}

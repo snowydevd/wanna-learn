@@ -80,3 +80,14 @@ describe("resolveInWorkspace", () => {
     for (const r of ["../x", "/etc/passwd", "src/../../x", ""]) expect(resolveInWorkspace("/w", r)).toBeNull();
   });
 });
+
+import { isPendingCreate } from "../src/guide/progress";
+describe("isPendingCreate", () => {
+  const g = guia({ pasos: [paso({ id: 1, tipo: "crear-archivo", archivo: "src/a.ts" }), paso({ id: 2, archivo: "src/a.ts" })] });
+  it("true solo para el archivo del crear-archivo actual", () => {
+    expect(isPendingCreate(g, "/w", "/w/src/a.ts")).toBe(true);
+    expect(isPendingCreate(g, "/w", "/w/node_modules/x.js")).toBe(false);
+    expect(isPendingCreate({ ...g, pasoActual: 1 }, "/w", "/w/src/a.ts")).toBe(false);
+    expect(isPendingCreate(undefined, "/w", "/w/src/a.ts")).toBe(false);
+  });
+});
