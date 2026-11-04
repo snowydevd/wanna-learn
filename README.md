@@ -75,7 +75,7 @@ claude plugin install want-to-learn@want-to-learn-local
 > Coming soon to the VS Code Marketplace. In the meantime, download the `.vsix` from the [latest release](https://github.com/snowydevd/wanna-learn/releases/latest) and install it:
 
 ```bash
-code --install-extension want-to-learn-0.1.0.vsix     # or: cursor --install-extension …
+code --install-extension want-to-learn-0.1.1.vsix     # or: cursor --install-extension …
 ```
 
 Or build it from source:
@@ -85,7 +85,7 @@ git clone https://github.com/snowydevd/wanna-learn.git
 cd wanna-learn/extension
 npm install
 npm run package
-code --install-extension want-to-learn-0.1.0.vsix     # or: cursor --install-extension …
+code --install-extension want-to-learn-0.1.1.vsix     # or: cursor --install-extension …
 ```
 
 The extension calls your installed Claude Code (`claude -p`, your own account) with **read-only tools** (`Read`, `Grep`, `Glob`). Claude can't touch your code; only the extension writes the guide file.

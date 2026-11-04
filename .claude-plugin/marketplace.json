@@ -9,7 +9,7 @@
     {
       "name": "want-to-learn",
       "description": "Learning mode: Claude builds a step-by-step guide and you write the code.",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "source": "./"
     }
   ]
