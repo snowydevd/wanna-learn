@@ -2,7 +2,7 @@
   "name": "want-to-learn",
   "displayName": "Wanna learn",
   "description": "Step-by-step coding guides with Claude: you write the code, Claude explains, gives hints and reviews it.",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "publisher": "chinidev",
   "license": "MIT",
   "engines": {
