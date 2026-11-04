@@ -1,0 +1,58 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Existing tag to release (e.g. v0.1.0)"
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: extension
+    env:
+      TAG: ${{ github.event.inputs.tag || github.ref_name }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.TAG }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: extension/package-lock.json
+
+      - name: Check tag matches versions
+        working-directory: .
+        run: |
+          v="${TAG#v}"
+          ext=$(node -p "require('./extension/package.json').version")
+          plugin=$(node -p "require('./.claude-plugin/plugin.json').version")
+          market=$(node -p "require('./.claude-plugin/marketplace.json').plugins[0].version")
+          echo "tag=$v extension=$ext plugin=$plugin marketplace=$market"
+          [ "$v" = "$ext" ] && [ "$v" = "$plugin" ] && [ "$v" = "$market" ] || {
+            echo "::error::Tag $TAG does not match every version in the manifests"; exit 1; }
+
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run package
+
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$TAG" *.vsix \
+            --repo "${{ github.repository }}" \
+            --title "Wanna learn $TAG" \
+            --generate-notes
