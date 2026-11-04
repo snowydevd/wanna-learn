@@ -18,7 +18,7 @@ export class PanelProvider implements vscode.WebviewViewProvider {
     const css = view.webview.asWebviewUri(vscode.Uri.joinPath(media, "panel.css"));
     const js = view.webview.asWebviewUri(vscode.Uri.joinPath(media, "panel.js"));
     const csp = `default-src 'none'; style-src ${view.webview.cspSource}; script-src 'nonce-${nonce}';`;
-    view.webview.html = `<!doctype html><html lang="es"><head><meta charset="utf-8">
+    view.webview.html = `<!doctype html><html lang="en"><head><meta charset="utf-8">
 <meta http-equiv="Content-Security-Policy" content="${csp}">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="${css}"></head>

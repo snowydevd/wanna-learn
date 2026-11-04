@@ -1,65 +1,70 @@
 import * as path from "node:path";
-import type { Guia, Paso, Revision } from "./types";
+import type { Guide, Step, Review } from "./types";
 
-export function currentStep(g: Guia): Paso | undefined {
-  return g.terminada ? undefined : g.pasos[g.pasoActual];
+export function currentStep(g: Guide): Step | undefined {
+  return g.finished ? undefined : g.steps[g.currentIndex];
 }
 
-function updateCurrent(g: Guia, fn: (p: Paso) => Paso): Paso[] {
-  return g.pasos.map((p, i) => (i === g.pasoActual ? fn(p) : p));
+function updateCurrent(g: Guide, fn: (s: Step) => Step): Step[] {
+  return g.steps.map((s, i) => (i === g.currentIndex ? fn(s) : s));
 }
 
-function advance(g: Guia, pasos: Paso[], resumen?: string): Guia {
-  const next = g.pasoActual + 1;
-  const terminada = next >= pasos.length;
-  const reset = pasos.map((p, i) => (i === next ? { ...p, nivelPista: 0 } : p));
-  return { ...g, pasos: reset, pasoActual: next, terminada, ...(terminada && resumen !== undefined ? { resumen } : {}) };
+function advance(g: Guide, steps: Step[], summary?: string): Guide {
+  const next = g.currentIndex + 1;
+  const finished = next >= steps.length;
+  const reset = steps.map((s, i) => (i === next ? { ...s, hintLevel: 0 } : s));
+  return { ...g, steps: reset, currentIndex: next, finished, ...(finished && summary !== undefined ? { summary } : {}) };
 }
 
-export function applyReview(g: Guia, r: Revision, resumen?: string): Guia {
+export function applyReview(g: Guide, r: Review, summary?: string): Guide {
   if (!currentStep(g)) return g;
-  const pasos = updateCurrent(g, (p) => ({ ...p, ultimaRevision: r, ...(r.aprobado ? { hecho: true } : {}) }));
-  return r.aprobado ? advance(g, pasos, resumen) : { ...g, pasos };
+  const steps = updateCurrent(g, (s) => ({ ...s, lastReview: r, ...(r.approved ? { done: true } : {}) }));
+  return r.approved ? advance(g, steps, summary) : { ...g, steps };
 }
 
-export function applyHint(g: Guia, pista: string): Guia {
+export function applyHint(g: Guide, hint: string): Guide {
   if (!currentStep(g)) return g;
-  return { ...g, pasos: updateCurrent(g, (p) => ({ ...p, ultimaPista: pista, nivelPista: Math.min(p.nivelPista + 1, 3) })) };
+  return { ...g, steps: updateCurrent(g, (s) => ({ ...s, lastHint: hint, hintLevel: s.hintLevel + 1 })) };
 }
 
-export function completeCreateFile(g: Guia): Guia {
-  if (currentStep(g)?.tipo !== "crear-archivo") return g;
-  return advance(g, updateCurrent(g, (p) => ({ ...p, hecho: true })));
+export function applyAnswer(g: Guide, question: string, answer: string): Guide {
+  if (!currentStep(g)) return g;
+  return { ...g, steps: updateCurrent(g, (s) => ({ ...s, lastQuestion: { question, answer } })) };
 }
 
-function createStep(archivo: string): Paso {
-  const dir = path.posix.dirname(archivo);
+export function completeCreateFile(g: Guide): Guide {
+  if (currentStep(g)?.kind !== "create-file") return g;
+  return advance(g, updateCurrent(g, (s) => ({ ...s, done: true })));
+}
+
+function createStep(file: string): Step {
+  const dir = path.posix.dirname(file);
   return {
     id: 0,
-    tipo: "crear-archivo",
-    titulo: "Crear archivo",
-    archivo,
-    donde: dir === "." ? "raíz del proyecto" : dir,
-    objetivo: `Crear el archivo vacío ${archivo}`,
-    conceptos: [],
-    criterios: [],
-    pistas: [],
-    hecho: false,
-    nivelPista: 0,
+    kind: "create-file",
+    title: "Create file",
+    file,
+    where: dir === "." ? "project root" : dir,
+    goal: `Create the empty file ${file}`,
+    concepts: [],
+    criteria: [],
+    hints: [],
+    done: false,
+    hintLevel: 0,
   };
 }
 
-export function normalizeSteps(pasos: Paso[], exists: (rel: string) => boolean): Paso[] {
+export function normalizeSteps(steps: Step[], exists: (rel: string) => boolean): Step[] {
   const seen = new Set<string>();
-  const out: Paso[] = [];
-  for (const p of pasos) {
-    if (!seen.has(p.archivo)) {
-      seen.add(p.archivo);
-      if (p.tipo === "codigo" && !exists(p.archivo)) out.push(createStep(p.archivo));
+  const out: Step[] = [];
+  for (const s of steps) {
+    if (!seen.has(s.file)) {
+      seen.add(s.file);
+      if (s.kind === "code" && !exists(s.file)) out.push(createStep(s.file));
     }
-    out.push(p);
+    out.push(s);
   }
-  return out.map((p, i) => ({ ...p, id: i + 1 }));
+  return out.map((s, i) => ({ ...s, id: i + 1 }));
 }
 
 export function resolveInWorkspace(root: string, rel: string): string | null {
@@ -70,9 +75,9 @@ export function resolveInWorkspace(root: string, rel: string): string | null {
   return abs;
 }
 
-/** ¿El archivo recién creado es el que pide el paso crear-archivo actual? */
-export function isPendingCreate(g: Guia | undefined, root: string, absPath: string): boolean {
-  const p = g && currentStep(g);
-  if (!p || p.tipo !== "crear-archivo") return false;
-  return resolveInWorkspace(root, p.archivo) === path.resolve(absPath);
+/** Is the newly created file the one the current create-file step asks for? */
+export function isPendingCreate(g: Guide | undefined, root: string, absPath: string): boolean {
+  const s = g && currentStep(g);
+  if (!s || s.kind !== "create-file") return false;
+  return resolveInWorkspace(root, s.file) === path.resolve(absPath);
 }

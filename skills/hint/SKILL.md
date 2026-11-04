@@ -1,22 +1,24 @@
 ---
 name: hint
-description: Da una pista para el paso actual de la guía de want-to-learn, sin dar la solución. Usar cuando el usuario escribe /hint o dice que está trabado en un paso de la guía.
+description: Gives a hint for the current step of the want-to-learn guide, without giving away the solution. Use when the user types /hint or says they're stuck on a guide step.
 ---
 
-# Pista para el paso actual
+# Hint for the current step
 
-1. Leé `.want-to-learn/guia.json`. Si no existe, decí que no hay una guía activa y que se empieza con `/want-to-learn <pedido>`.
-2. Mirá `pasoActual` (índice desde 0 en `pasos`) y el `nivelPista` de ese paso.
-3. Leé el archivo del paso actual para ver lo que el usuario ya escribió. Si escribió algo, adaptá la pista a dónde está: no le repitas lo que ya resolvió.
-4. Da la siguiente pista (`nivelPista + 1`, máximo 3) de la lista de pistas del paso:
-   - **1, suave:** por dónde empezar, qué pensar primero. Sin nombrar funciones ni APIs.
-   - **2, media:** qué API, función o estructura usar.
-   - **3, fuerte:** el esqueleto del paso descripto en palabras ("primero importás X, después definís Y que recibe Z y devuelve W").
-5. En el paso actual, actualizá `nivelPista` y guardá la pista en `ultimaPista` (el JSON tiene que seguir siendo válido).
+1. Read `.want-to-learn/guide.json`. If it doesn't exist, say there's no active guide and that one starts with `/want-to-learn <request>`.
+2. Look at `currentIndex` (0-based index into `steps`) and that step's `hintLevel`.
+3. Read the current step's file to see what the user has already written. If they wrote something, adapt the hint to where they are: don't repeat what they already solved.
+4. Give the next hint (`hintLevel + 1`, no cap) from the step's hint list:
+   - **1, gentle:** where to start, what to think about first. Without naming functions or APIs.
+   - **2, medium:** which API, function or structure to use.
+   - **3, strong:** the step's skeleton described in words ("first you import X, then you define Y that takes Z and returns W").
+   - **4 or more:** each one more concrete, aiming at exactly where they got stuck based on what they've written (which line, what's missing, which concept isn't clicking). If needed, explain that concept with an example **different** from their code.
+5. On the current step, update `hintLevel` and store the hint in `lastHint` (the JSON must stay valid).
 
-## Reglas
+## Rules
 
-- Nunca escribas el código resuelto del paso, ni siquiera en la pista 3. Como mucho una línea de *sintaxis* genérica (ej. cómo se ve un import) si es lo que lo traba.
-- No edites archivos de código. Solo `.want-to-learn/guia.json`.
-- Si ya usó las 3 pistas y sigue trabado, preguntale qué parte concreta no le cierra y explicá ese concepto con un ejemplo **distinto** al de su código.
-- Terminá con: "Cuando lo tengas, `/check`."
+- Never write the step's solved code, not even in hint 3. At most one line of generic *syntax* (e.g. what an import looks like) if that's what's blocking them.
+- Don't edit code files. Only `.want-to-learn/guide.json`.
+- Short, direct hints: 1 to 3 sentences.
+- Write in the same language as the guide's `request`.
+- End with: "When you have it, `/check`."

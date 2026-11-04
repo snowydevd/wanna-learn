@@ -1,29 +1,29 @@
 import { describe, it, expect } from "vitest";
 import { clampLine, resolveAnchor } from "../src/anchor";
 
-const five = ["import a", "  import b", "", "export x", "fin"];
+const five = ["import a", "  import b", "", "export x", "end"];
 
 describe("resolveAnchor", () => {
-  it("línea siguiente al texto (ignorando espacios)", () => {
-    expect(resolveAnchor(five, { texto: "import b  " })).toBe(2);
+  it("line after the text (ignoring whitespace)", () => {
+    expect(resolveAnchor(five, { text: "import b  " })).toBe(2);
   });
-  it("texto ausente usa linea", () => {
-    expect(resolveAnchor(five, { texto: "nope", linea: 3 })).toBe(2);
+  it("missing text falls back to line", () => {
+    expect(resolveAnchor(five, { text: "nope", line: 3 })).toBe(2);
   });
-  it("sin ancla → última línea", () => {
+  it("no anchor → last line", () => {
     expect(resolveAnchor(five)).toBe(4);
   });
-  it("archivo vacío → 0", () => {
+  it("empty file → 0", () => {
     expect(resolveAnchor([])).toBe(0);
-    expect(resolveAnchor([""], { texto: "x" })).toBe(0);
+    expect(resolveAnchor([""], { text: "x" })).toBe(0);
   });
-  it("texto en la última línea no se sale del archivo", () => {
-    expect(resolveAnchor(five, { texto: "fin" })).toBe(4);
+  it("text on the last line stays inside the file", () => {
+    expect(resolveAnchor(five, { text: "end" })).toBe(4);
   });
 });
 
 describe("clampLine", () => {
-  it("convierte 1-based a 0-based dentro de rango", () => {
+  it("converts 1-based to an in-range 0-based index", () => {
     expect(clampLine(five, 99)).toBe(4);
     expect(clampLine(five, 0)).toBe(0);
     expect(clampLine(five, 2)).toBe(1);

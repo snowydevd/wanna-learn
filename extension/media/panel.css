@@ -32,3 +32,13 @@ button.link { background: none; padding: 0; color: var(--vscode-textLink-foregro
 footer { margin-top: 10px; }
 .spinner { width: 18px; height: 18px; border: 2px solid var(--vscode-panel-border); border-top-color: var(--vscode-focusBorder); border-radius: 50%; animation: spin 1s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
+.card-h { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
+button.collapse { background: none; padding: 0 2px; font-size: 13px; line-height: 1; color: var(--vscode-descriptionForeground); transition: transform .15s; }
+button.collapse:hover { color: var(--vscode-foreground); }
+.card.collapsed .card-b { display: none; }
+.card.collapsed button.collapse { transform: rotate(-90deg); }
+.card.answer { border-color: var(--vscode-textLink-foreground); }
+.card .q { font-style: italic; }
+.ask { display: flex; flex-direction: column; gap: 6px; margin-top: 8px; }
+.ask button { align-self: flex-start; }
+.hidden { display: none; }

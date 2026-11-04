@@ -1,22 +1,22 @@
-import type { Guia } from "./types";
+import type { Guide } from "./types";
 
-export type ParseResult = { ok: true; guia: Guia } | { ok: false; error: string };
+export type ParseResult = { ok: true; guide: Guide } | { ok: false; error: string };
 
 const isStr = (v: unknown): v is string => typeof v === "string";
 const isNum = (v: unknown): v is number => typeof v === "number" && Number.isFinite(v);
 const isStrArr = (v: unknown) => Array.isArray(v) && v.every(isStr);
 
-function checkPaso(p: any, i: number): string | null {
-  const at = `paso ${i + 1}`;
-  if (!p || typeof p !== "object") return `${at}: no es un objeto`;
-  if (!isNum(p.id)) return `${at}: falta "id"`;
-  if (p.tipo !== "crear-archivo" && p.tipo !== "codigo") return `${at}: "tipo" inválido`;
-  for (const k of ["titulo", "archivo", "donde", "objetivo"]) if (!isStr(p[k])) return `${at}: falta "${k}"`;
-  if (!Array.isArray(p.conceptos)) return `${at}: falta "conceptos"`;
-  if (!isStrArr(p.criterios)) return `${at}: falta "criterios"`;
-  if (!isStrArr(p.pistas)) return `${at}: falta "pistas"`;
-  if (typeof p.hecho !== "boolean") return `${at}: falta "hecho"`;
-  if (!isNum(p.nivelPista)) return `${at}: falta "nivelPista"`;
+function checkStep(s: any, i: number): string | null {
+  const at = `step ${i + 1}`;
+  if (!s || typeof s !== "object") return `${at}: not an object`;
+  if (!isNum(s.id)) return `${at}: missing "id"`;
+  if (s.kind !== "create-file" && s.kind !== "code") return `${at}: invalid "kind"`;
+  for (const k of ["title", "file", "where", "goal"]) if (!isStr(s[k])) return `${at}: missing "${k}"`;
+  if (!Array.isArray(s.concepts)) return `${at}: missing "concepts"`;
+  if (!isStrArr(s.criteria)) return `${at}: missing "criteria"`;
+  if (!isStrArr(s.hints)) return `${at}: missing "hints"`;
+  if (typeof s.done !== "boolean") return `${at}: missing "done"`;
+  if (!isNum(s.hintLevel)) return `${at}: missing "hintLevel"`;
   return null;
 }
 
@@ -25,23 +25,23 @@ export function parseGuide(text: string): ParseResult {
   try {
     data = JSON.parse(text);
   } catch {
-    return { ok: false, error: "guia.json no es JSON válido" };
+    return { ok: false, error: "guide.json is not valid JSON" };
   }
-  if (!data || typeof data !== "object") return { ok: false, error: "guia.json no es un objeto" };
-  if (data.version !== 1) return { ok: false, error: `versión de guía no soportada: ${String(data.version)}` };
-  for (const k of ["pedido", "titulo", "panorama"]) if (!isStr(data[k])) return { ok: false, error: `falta "${k}"` };
-  if (typeof data.terminada !== "boolean") return { ok: false, error: 'falta "terminada"' };
-  if (!Array.isArray(data.pasos)) return { ok: false, error: 'falta "pasos"' };
-  for (let i = 0; i < data.pasos.length; i++) {
-    const err = checkPaso(data.pasos[i], i);
+  if (!data || typeof data !== "object") return { ok: false, error: "guide.json is not an object" };
+  if (data.version !== 1) return { ok: false, error: `unsupported guide version: ${String(data.version)}` };
+  for (const k of ["request", "title", "overview"]) if (!isStr(data[k])) return { ok: false, error: `missing "${k}"` };
+  if (typeof data.finished !== "boolean") return { ok: false, error: 'missing "finished"' };
+  if (!Array.isArray(data.steps)) return { ok: false, error: 'missing "steps"' };
+  for (let i = 0; i < data.steps.length; i++) {
+    const err = checkStep(data.steps[i], i);
     if (err) return { ok: false, error: err };
   }
-  if (!Number.isInteger(data.pasoActual) || data.pasoActual < 0 || data.pasoActual > data.pasos.length) {
-    return { ok: false, error: '"pasoActual" fuera de rango' };
+  if (!Number.isInteger(data.currentIndex) || data.currentIndex < 0 || data.currentIndex > data.steps.length) {
+    return { ok: false, error: '"currentIndex" out of range' };
   }
-  return { ok: true, guia: data as Guia };
+  return { ok: true, guide: data as Guide };
 }
 
-export function serializeGuide(g: Guia): string {
+export function serializeGuide(g: Guide): string {
   return JSON.stringify(g, null, 2) + "\n";
 }

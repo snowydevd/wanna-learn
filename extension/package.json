@@ -1,7 +1,7 @@
 {
   "name": "want-to-learn",
   "displayName": "Want to learn",
-  "description": "Guías paso a paso con Claude: vos escribís el código, Claude explica, da pistas y revisa.",
+  "description": "Step-by-step coding guides with Claude: you write the code, Claude explains, gives hints and reviews it.",
   "version": "0.1.0",
   "publisher": "local",
   "license": "MIT",
@@ -28,7 +28,7 @@
         {
           "type": "webview",
           "id": "wantToLearn.panel",
-          "name": "Guía"
+          "name": "Guide"
         }
       ]
     },
@@ -38,18 +38,18 @@
         "wantToLearn.claudePath": {
           "type": "string",
           "default": "claude",
-          "description": "Ruta o nombre del ejecutable de Claude Code."
+          "description": "Path or name of the Claude Code executable."
         },
         "wantToLearn.model": {
           "type": "string",
           "default": "",
-          "description": "Modelo para Claude (vacío = el default del CLI)."
+          "description": "Model for Claude (empty = the CLI default)."
         },
         "wantToLearn.timeoutSeconds": {
           "type": "number",
           "default": 300,
           "minimum": 30,
-          "description": "Tiempo máximo de espera por respuesta de Claude."
+          "description": "Maximum time to wait for a Claude response, in seconds."
         }
       }
     }

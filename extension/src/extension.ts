@@ -1,24 +1,24 @@
 import * as vscode from "vscode";
 import * as path from "node:path";
-import { Tutor, type Result } from "./tutor";
+import { GUIDE_FILE, Tutor, type Result } from "./tutor";
 import { resolveClaudePath, runClaude } from "./claude/runner";
 import { existsSync } from "node:fs";
 import { homedir } from "node:os";
 import { loadRules } from "./claude/prompts";
 import { currentStep, isPendingCreate, resolveInWorkspace } from "./guide/progress";
 import { clampLine, resolveAnchor } from "./anchor";
-import type { Guia } from "./guide/types";
+import type { Guide } from "./guide/types";
 import type { ViewState } from "./webview/render";
 import { PanelProvider, type PanelMessage } from "./webview/provider";
 
-type Busy = null | "hint" | "review" | "create";
+type Busy = null | "hint" | "review" | "create" | "ask";
 
 export function activate(context: vscode.ExtensionContext): void {
   const root = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
   let busy: Busy = null;
   let generating: string | null = null;
   let lastError: string | undefined;
-  let guia: Guia | undefined;
+  let guide: Guide | undefined;
 
   const decoration = vscode.window.createTextEditorDecorationType({
     isWholeLine: true,
@@ -60,18 +60,18 @@ export function activate(context: vscode.ExtensionContext): void {
 
   async function refresh(): Promise<void> {
     if (!tutor) return provider.render({ kind: "no-workspace" });
-    if (generating !== null) return provider.render({ kind: "generating", pedido: generating });
+    if (generating !== null) return provider.render({ kind: "generating", request: generating });
     const l = await tutor.load();
     let state: ViewState;
     if (l.kind === "none") {
-      guia = undefined;
+      guide = undefined;
       state = { kind: "none", error: lastError };
     } else if (l.kind === "error") {
-      guia = undefined;
+      guide = undefined;
       state = { kind: "error-guide", error: l.error };
     } else {
-      guia = l.guia;
-      state = { kind: "guide", guia: l.guia, busy, error: lastError };
+      guide = l.guide;
+      state = { kind: "guide", guide: l.guide, busy, error: lastError };
     }
     provider.render(state);
     updateDecorations();
@@ -86,13 +86,13 @@ export function activate(context: vscode.ExtensionContext): void {
     busy = null;
     if (!r.ok) lastError = r.error;
     await refresh();
-    if (r.ok && kind === "create") await openStep(r.guia, r.guia.pasoActual - 1);
+    if (r.ok && kind === "create") await openStep(r.guide, r.guide.currentIndex - 1);
   }
 
   async function openFile(rel: string, line?: number): Promise<void> {
     if (!root) return;
     const abs = resolveInWorkspace(root, rel);
-    if (!abs) return void vscode.window.showWarningMessage(`La ruta "${rel}" está fuera del proyecto.`);
+    if (!abs) return void vscode.window.showWarningMessage(`The path "${rel}" is outside the project.`);
     try {
       const doc = await vscode.workspace.openTextDocument(abs);
       const editor = await vscode.window.showTextDocument(doc, { preview: false });
@@ -102,24 +102,24 @@ export function activate(context: vscode.ExtensionContext): void {
       editor.selection = new vscode.Selection(pos, pos);
       editor.revealRange(new vscode.Range(pos, pos), vscode.TextEditorRevealType.InCenter);
     } catch {
-      vscode.window.showWarningMessage(`No pude abrir ${rel}. ¿Existe el archivo?`);
+      vscode.window.showWarningMessage(`Couldn't open ${rel}. Does the file exist?`);
     }
   }
 
-  async function openStep(g: Guia, index: number): Promise<void> {
-    const p = g.pasos[index];
-    if (!p || !root) return;
-    const abs = resolveInWorkspace(root, p.archivo);
+  async function openStep(g: Guide, index: number): Promise<void> {
+    const s = g.steps[index];
+    if (!s || !root) return;
+    const abs = resolveInWorkspace(root, s.file);
     let line = 0;
     if (abs) {
       try {
         const doc = await vscode.workspace.openTextDocument(abs);
-        line = resolveAnchor(doc.getText().split("\n"), p.ancla);
+        line = resolveAnchor(doc.getText().split("\n"), s.anchor);
       } catch {
-        /* archivo inexistente: openFile avisa */
+        /* file doesn't exist: openFile shows the warning */
       }
     }
-    await openFile(p.archivo, line);
+    await openFile(s.file, line);
   }
 
   async function confirm(msg: string, ok: string): Promise<boolean> {
@@ -130,44 +130,48 @@ export function activate(context: vscode.ExtensionContext): void {
     if (!tutor) return;
     switch (m.action) {
       case "generate": {
-        if (!m.pedido || busy || generating !== null) return;
-        generating = m.pedido;
+        if (!m.request || busy || generating !== null) return;
+        generating = m.request;
         lastError = undefined;
         await refresh();
-        const r = await tutor.generate(m.pedido);
+        const r = await tutor.generate(m.request);
         generating = null;
         if (!r.ok) lastError = r.error;
         await refresh();
-        if (r.ok) await openStep(r.guia, 0);
+        if (r.ok) await openStep(r.guide, 0);
         return;
       }
       case "hint":
         return run("hint", () => tutor.hint());
       case "review":
         return run("review", () => tutor.review());
+      case "ask":
+        if (!m.question?.trim()) return;
+        return run("ask", () => tutor.ask(m.question!));
       case "create-file":
         return run("create", () => tutor.createFile());
       case "open-step":
-        if (guia) await openStep(guia, Number(m.index));
+        if (guide) await openStep(guide, Number(m.index));
         return;
       case "open-problem": {
-        if (!m.archivo || !root) return;
-        const abs = resolveInWorkspace(root, m.archivo);
+        if (!m.file || !root) return;
+        const abs = resolveInWorkspace(root, m.file);
         let line = 0;
         if (abs) {
           try {
             const doc = await vscode.workspace.openTextDocument(abs);
-            line = clampLine(doc.getText().split("\n"), Number(m.linea) || 1);
+            line = clampLine(doc.getText().split("\n"), Number(m.line) || 1);
           } catch {
-            /* openFile avisa */
+            /* openFile shows the warning */
           }
         }
-        return openFile(m.archivo, line);
+        return openFile(m.file, line);
       }
       case "abandon":
       case "new": {
-        const ask = m.action === "new" ? "¿Empezar una guía nueva? Se borra la guía actual." : "¿Abandonar la guía? Se borra el progreso.";
-        if (busy || !(await confirm(ask, m.action === "new" ? "Empezar otra" : "Abandonar"))) return;
+        const isNew = m.action === "new";
+        const ask = isNew ? "Start a new guide? The current guide will be deleted." : "Abandon the guide? Your progress will be deleted.";
+        if (busy || !(await confirm(ask, isNew ? "Start new guide" : "Abandon"))) return;
         await tutor.abandon();
         lastError = undefined;
         return refresh();
@@ -177,29 +181,29 @@ export function activate(context: vscode.ExtensionContext): void {
 
   function updateDecorations(): void {
     for (const editor of vscode.window.visibleTextEditors) {
-      const p = guia && currentStep(guia);
-      const abs = p && root ? resolveInWorkspace(root, p.archivo) : null;
-      if (!p || p.tipo !== "codigo" || !abs || editor.document.uri.fsPath !== abs) {
+      const s = guide && currentStep(guide);
+      const abs = s && root ? resolveInWorkspace(root, s.file) : null;
+      if (!s || s.kind !== "code" || !abs || editor.document.uri.fsPath !== abs) {
         editor.setDecorations(decoration, []);
         continue;
       }
-      const line = resolveAnchor(editor.document.getText().split("\n"), p.ancla);
+      const line = resolveAnchor(editor.document.getText().split("\n"), s.anchor);
       editor.setDecorations(decoration, [{
         range: new vscode.Range(line, 0, line, 0),
-        renderOptions: { after: { contentText: `✏️ escribí acá (paso ${guia!.pasoActual + 1})` } },
+        renderOptions: { after: { contentText: `✏️ write here (step ${guide!.currentIndex + 1})` } },
       }]);
     }
   }
 
   if (root && tutor) {
-    const guideWatcher = vscode.workspace.createFileSystemWatcher(new vscode.RelativePattern(root, ".want-to-learn/guia.json"));
+    const guideWatcher = vscode.workspace.createFileSystemWatcher(new vscode.RelativePattern(root, GUIDE_FILE));
     const onGuide = () => { if (!busy && generating === null) void refresh(); };
     guideWatcher.onDidChange(onGuide);
     guideWatcher.onDidCreate(onGuide);
     guideWatcher.onDidDelete(onGuide);
     const fileWatcher = vscode.workspace.createFileSystemWatcher(new vscode.RelativePattern(root, "**/*"), false, true, true);
     fileWatcher.onDidCreate(async (uri) => {
-      if (busy || generating !== null || !isPendingCreate(guia, root, uri.fsPath)) return;
+      if (busy || generating !== null || !isPendingCreate(guide, root, uri.fsPath)) return;
       if (await tutor.syncCreatedFile()) await refresh();
     });
     context.subscriptions.push(

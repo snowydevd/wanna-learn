@@ -1,47 +1,49 @@
 # want-to-learn
 
-Plugin de Claude Code para aprender mientras construís. En lugar de hacer los cambios, Claude arma una guía paso a paso y vos escribís el código.
+A Claude Code plugin and VS Code / Cursor extension for learning while you build. Instead of making the changes for you, Claude builds a step-by-step guide and you write the code.
 
-## Comandos
+Claude replies in the language you write your request in.
 
-| Comando | Qué hace |
+## Claude Code plugin
+
+| Command | What it does |
 |---|---|
-| `/want-to-learn <pedido>` | Lee el proyecto, arma la guía y te muestra el paso 1 (archivo, dónde, objetivo, conceptos nuevos con link a docs). |
-| `/hint` | Pista del paso actual. Cada vez que lo pedís es un poco más concreta (3 niveles). Nunca da la solución. |
-| `/check` | Revisa tu código. Si está bien, avanza al siguiente paso; si no, te explica qué corregir sin reescribirlo. |
+| `/want-to-learn <request>` | Reads the project, builds the guide and shows step 1 (file, where, goal, new concepts with links to the docs). |
+| `/hint` | A hint for the current step. Each time you ask it gets a bit more concrete, with no limit. It never gives away the solution. |
+| `/check` | Reviews your code. If it's right, it moves to the next step; if not, it explains what to fix without rewriting it. |
 
-Si choca con otro comando del mismo nombre, usá la forma con prefijo: `/want-to-learn:hint`, `/want-to-learn:check`.
+If another command has the same name, use the prefixed form: `/want-to-learn:hint`, `/want-to-learn:check`.
 
-El progreso se guarda en `.want-to-learn/guia.json` dentro del proyecto donde corrés Claude, así podés retomar en otra sesión. La extensión de VS Code usa el mismo archivo.
+Progress is saved to `.want-to-learn/guide.json` in the project where you run Claude, so you can pick it up in another session. The VS Code extension uses the same file.
 
-## Instalación local
+### Local install
 
 ```bash
 claude plugin marketplace add ~/Documents/Projects/want-to-learn
 claude plugin install want-to-learn@want-to-learn-local
 ```
 
-Después de editar los skills: `claude plugin marketplace update want-to-learn-local` y reiniciá la sesión.
+After editing the skills: `claude plugin marketplace update want-to-learn-local` and restart the session.
 
-## Extensión de VS Code / Cursor
+## VS Code / Cursor extension
 
-Panel lateral "Want to learn" (ícono del birrete en la barra lateral): escribís el pedido, Claude arma la guía y ves los pasos como un timeline. El paso actual muestra dónde escribir, el objetivo y los conceptos nuevos, con botones **💡 Pista**, **✓ Revisar mi código** y **📄 Crear archivo**. En el editor se resalta la línea donde escribir.
+A "Want to learn" side panel (the graduation cap icon in the activity bar): you type your request, Claude builds the guide and you see the steps as a timeline. The current step shows where to write, the goal and the new concepts, with **💡 Hint**, **❓ Ask**, **✓ Check my code** and **📄 Create file** buttons. Hint, answer and review cards collapse with the arrow. The line where you should write is highlighted in the editor.
 
-La extensión usa tu Claude Code instalado (`claude -p`, tu misma cuenta) con herramientas de solo lectura: Claude nunca edita tu código, solo la extensión escribe `guia.json`.
+The extension uses your installed Claude Code (`claude -p`, your same account) with read-only tools: Claude never edits your code; only the extension writes `guide.json`.
 
 ```bash
 cd extension
 npm install
 npm test               # tests
-npm run package        # genera want-to-learn-<versión>.vsix
+npm run package        # builds want-to-learn-<version>.vsix
 code --install-extension want-to-learn-0.1.0.vsix --force
 cursor --install-extension want-to-learn-0.1.0.vsix --force
 ```
 
-Settings: `wantToLearn.claudePath` (default `claude`), `wantToLearn.model` (vacío = default del CLI), `wantToLearn.timeoutSeconds` (default 300).
+Settings: `wantToLearn.claudePath` (default `claude`), `wantToLearn.model` (empty = the CLI default), `wantToLearn.timeoutSeconds` (default 300).
 
-La guía va en la primera carpeta del workspace. Agregá `.want-to-learn/` al `.gitignore` del proyecto.
+The guide goes in the first workspace folder. Add `.want-to-learn/` to the project's `.gitignore`.
 
-## Próximo
+## Next
 
-- Si Claude se saltea la regla de no editar código en la terminal, agregar un hook `PreToolUse` que bloquee Edit/Write fuera de `.want-to-learn/` mientras haya una guía activa.
+- If Claude ignores the no-editing rule in the terminal, add a `PreToolUse` hook that blocks Edit/Write outside `.want-to-learn/` while a guide is active.

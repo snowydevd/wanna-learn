@@ -1,11 +1,16 @@
 {
   "name": "want-to-learn",
-  "description": "Modo aprendizaje: Claude arma una guía paso a paso y vos escribís el código. Incluye pistas y revisión antes de avanzar.",
+  "description": "Learning mode: Claude builds a step-by-step guide and you write the code. Includes hints and a review before moving on.",
   "version": "0.1.0",
   "author": {
     "name": "Lautaro Chinikiba",
     "email": "lautarochinikiba@gmail.com"
   },
   "license": "MIT",
-  "keywords": ["learning", "tutor", "guide", "education"]
+  "keywords": [
+    "learning",
+    "tutor",
+    "guide",
+    "education"
+  ]
 }

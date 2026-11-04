@@ -1,19 +1,19 @@
-import type { Ancla } from "./guide/types";
+import type { Anchor } from "./guide/types";
 
-/** Convierte una línea 1-based a índice 0-based dentro del archivo. */
-export function clampLine(lines: string[], linea1: number): number {
+/** Converts a 1-based line number to a 0-based index inside the file. */
+export function clampLine(lines: string[], line1: number): number {
   const last = Math.max(lines.length - 1, 0);
-  return Math.min(Math.max(Math.floor(linea1) - 1, 0), last);
+  return Math.min(Math.max(Math.floor(line1) - 1, 0), last);
 }
 
-/** Índice 0-based de la línea donde el usuario debe escribir. */
-export function resolveAnchor(lines: string[], ancla?: Ancla): number {
+/** 0-based index of the line where the user should write. */
+export function resolveAnchor(lines: string[], anchor?: Anchor): number {
   const last = Math.max(lines.length - 1, 0);
-  const texto = ancla?.texto?.trim();
-  if (texto) {
-    const i = lines.findIndex((l) => l.trim() === texto || l.includes(texto));
+  const text = anchor?.text?.trim();
+  if (text) {
+    const i = lines.findIndex((l) => l.trim() === text || l.includes(text));
     if (i >= 0) return Math.min(i + 1, last);
   }
-  if (ancla?.linea !== undefined) return clampLine(lines, ancla.linea);
+  if (anchor?.line !== undefined) return clampLine(lines, anchor.line);
   return last;
 }

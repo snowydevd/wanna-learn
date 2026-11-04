@@ -1,38 +1,40 @@
-export type StepKind = "crear-archivo" | "codigo";
+export type StepKind = "create-file" | "code";
 
-export interface Concepto { nombre: string; explicacion: string; docs: string }
-/** `linea` es 1-based. */
-export interface Ancla { texto?: string; linea?: number }
-export interface Problema { archivo: string; linea: number; explicacion: string }
-export interface Revision { aprobado: boolean; mensaje: string; problemas: Problema[]; sugerencias: string[] }
+export interface Concept { name: string; explanation: string; docs: string }
+/** `line` is 1-based. */
+export interface Anchor { text?: string; line?: number }
+export interface Problem { file: string; line: number; explanation: string }
+export interface Question { question: string; answer: string }
+export interface Review { approved: boolean; message: string; problems: Problem[]; suggestions: string[] }
 
-export interface Paso {
+export interface Step {
   id: number;
-  tipo: StepKind;
-  titulo: string;
-  archivo: string;
-  donde: string;
-  ancla?: Ancla;
-  objetivo: string;
-  conceptos: Concepto[];
-  /** Privado: nunca se muestra en el panel. */
-  criterios: string[];
-  /** Privado: nunca se muestra en el panel. */
-  pistas: string[];
-  hecho: boolean;
-  nivelPista: number;
-  ultimaPista?: string;
-  ultimaRevision?: Revision;
+  kind: StepKind;
+  title: string;
+  file: string;
+  where: string;
+  anchor?: Anchor;
+  goal: string;
+  concepts: Concept[];
+  /** Private: never shown in the panel. */
+  criteria: string[];
+  /** Private: never shown in the panel. */
+  hints: string[];
+  done: boolean;
+  hintLevel: number;
+  lastHint?: string;
+  lastReview?: Review;
+  lastQuestion?: Question;
 }
 
-export interface Guia {
+export interface Guide {
   version: 1;
-  pedido: string;
-  titulo: string;
-  panorama: string;
-  /** Índice 0-based; igual a pasos.length cuando la guía terminó. */
-  pasoActual: number;
-  terminada: boolean;
-  resumen?: string;
-  pasos: Paso[];
+  request: string;
+  title: string;
+  overview: string;
+  /** 0-based index; equals steps.length once the guide is finished. */
+  currentIndex: number;
+  finished: boolean;
+  summary?: string;
+  steps: Step[];
 }

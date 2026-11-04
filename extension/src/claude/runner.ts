@@ -45,15 +45,15 @@ export function parseCliOutput(stdout: string): RunResult {
   try {
     d = JSON.parse(stdout);
   } catch {
-    return { ok: false, error: "Claude devolvió una respuesta que no pude leer." };
+    return { ok: false, error: "Claude returned a response I couldn't read." };
   }
   if (d?.is_error) {
     const msg = String(d.result ?? "");
-    if (/log ?in/i.test(msg)) return { ok: false, error: "Claude Code no tiene sesión iniciada. Corré `claude /login` en una terminal y volvé a intentar." };
-    return { ok: false, error: `Claude devolvió un error: ${msg || "desconocido"}` };
+    if (/log ?in/i.test(msg)) return { ok: false, error: "Claude Code is not logged in. Run `claude /login` in a terminal and try again." };
+    return { ok: false, error: `Claude returned an error: ${msg || "unknown"}` };
   }
   if (d?.structured_output === undefined || d.structured_output === null) {
-    return { ok: false, error: "Claude no devolvió la respuesta en el formato esperado. Probá de nuevo." };
+    return { ok: false, error: "Claude didn't return the answer in the expected format. Try again." };
   }
   return { ok: true, data: d.structured_output };
 }
@@ -71,11 +71,11 @@ export function runClaude(o: RunOptions, spawn: SpawnFn = defaultSpawn): Promise
     try {
       proc = spawn(o.claudePath, buildArgs(o), { cwd: o.cwd });
     } catch (e: any) {
-      return resolve({ ok: false, error: `No pude ejecutar claude: ${e?.message ?? e}` });
+      return resolve({ ok: false, error: `Couldn't run claude: ${e?.message ?? e}` });
     }
     const timer = setTimeout(() => {
       proc.kill();
-      finish({ ok: false, error: `Claude tardó demasiado (más de ${Math.round(o.timeoutMs / 1000)} s). Probá de nuevo.` });
+      finish({ ok: false, error: `Claude took too long (more than ${Math.round(o.timeoutMs / 1000)} s). Try again.` });
     }, o.timeoutMs);
     let out = "";
     let err = "";
@@ -83,14 +83,14 @@ export function runClaude(o: RunOptions, spawn: SpawnFn = defaultSpawn): Promise
     proc.stderr?.on("data", (c) => (err += c.toString()));
     proc.on("error", (e) => {
       if (e.code === "ENOENT") {
-        finish({ ok: false, error: `No encontré el comando claude ("${o.claudePath}"). Instalá Claude Code o configurá la ruta en el setting wantToLearn.claudePath.` });
+        finish({ ok: false, error: `Couldn't find the claude command ("${o.claudePath}"). Install Claude Code or set its path in the wantToLearn.claudePath setting.` });
       } else {
-        finish({ ok: false, error: `No pude ejecutar claude: ${e.message}` });
+        finish({ ok: false, error: `Couldn't run claude: ${e.message}` });
       }
     });
     proc.on("close", (code) => {
       if (!out.trim() && code !== 0) {
-        finish({ ok: false, error: `claude terminó con código ${code}: ${err.trim().slice(0, 400) || "sin detalles"}` });
+        finish({ ok: false, error: `claude exited with code ${code}: ${err.trim().slice(0, 400) || "no details"}` });
       } else {
         finish(parseCliOutput(out));
       }
@@ -98,7 +98,7 @@ export function runClaude(o: RunOptions, spawn: SpawnFn = defaultSpawn): Promise
   });
 }
 
-/** Con el setting por defecto, prefiere ~/.local/bin/claude (VS Code abierto desde el escritorio puede no tenerlo en PATH). */
+/** With the default setting, prefer ~/.local/bin/claude (VS Code launched from the desktop may not have it on PATH). */
 export function resolveClaudePath(setting: string, home: string, exists: (p: string) => boolean): string {
   const s = setting.trim() || "claude";
   if (s !== "claude") return s;
