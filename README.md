@@ -72,7 +72,13 @@ claude plugin install want-to-learn@want-to-learn-local
 
 ### VS Code / Cursor extension
 
-> Coming soon to the VS Code Marketplace. In the meantime, build it from source:
+> Coming soon to the VS Code Marketplace. In the meantime, download the `.vsix` from the [latest release](https://github.com/snowydevd/wanna-learn/releases/latest) and install it:
+
+```bash
+code --install-extension want-to-learn-0.1.0.vsix     # or: cursor --install-extension …
+```
+
+Or build it from source:
 
 ```bash
 git clone https://github.com/snowydevd/wanna-learn.git
