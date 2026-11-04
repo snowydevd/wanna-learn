@@ -9,7 +9,7 @@ const RULES_HEADING = "Rules (apply while a guide is active)";
 
 const EXTENSION_NOTE = `
 ## Extension mode (VS Code)
-- You are being called by the want-to-learn extension. Do not write or edit any file: only read the project and return your answer as JSON matching the requested schema. The extension saves the guide.
+- You are being called by the wanna-learn extension. Do not write or edit any file: only read the project and return your answer as JSON matching the requested schema. The extension saves the guide.
 - File paths are always relative to the workspace root (your current directory).
 - If there is a CLAUDE.md at the root, read it to learn the project's conventions.
 - Write in the same language as the user's request (quoted in each prompt). Code, file and API names stay as they are.
@@ -28,7 +28,7 @@ export function extractSection(md: string, heading: string): string {
 
 export function loadRules(skillsDir: string): string {
   const md = readFileSync(path.join(skillsDir, "want-to-learn", "SKILL.md"), "utf8");
-  return `# want-to-learn tutor\n\n## Rules\n${extractSection(md, RULES_HEADING)}\n${EXTENSION_NOTE}`;
+  return `# wanna-learn tutor\n\n## Rules\n${extractSection(md, RULES_HEADING)}\n${EXTENSION_NOTE}`;
 }
 
 const str = { type: "string" };

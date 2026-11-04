@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🎓 want-to-learn
+# 🎓 wanna-learn
 
 **Stop copy-pasting AI code. Learn to write it yourself.**
 
@@ -19,7 +19,7 @@ instead of making the change for you, it builds a step-by-step guide and **you**
 
 ## Why
 
-AI coding assistants are great at writing code, but if they always write it for you, you never learn the codebase, the library or the concept behind it. **want-to-learn** keeps Claude's knowledge of your project and flips the roles:
+AI coding assistants are great at writing code, but if they always write it for you, you never learn the codebase, the library or the concept behind it. **wanna-learn** keeps Claude's knowledge of your project and flips the roles:
 
 - 🧭 **Claude plans**: it reads your project and splits the change into small, verifiable steps.
 - ⌨️ **You write**: every line of code is yours. Claude never edits your files.
@@ -98,7 +98,7 @@ If another plugin uses the same command name, use the prefixed form: `/want-to-l
 
 ### In the editor (extension)
 
-Open the **Want to learn** panel (🎓 in the activity bar), describe what you want to build and click **Generate guide**. The steps appear as a timeline, and the line where you should write is highlighted in the editor.
+Open the **Wanna learn** panel (🎓 in the activity bar), describe what you want to build and click **Generate guide**. The steps appear as a timeline, and the line where you should write is highlighted in the editor.
 
 | Button | What it does |
 |---|---|

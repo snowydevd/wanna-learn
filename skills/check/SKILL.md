@@ -1,6 +1,6 @@
 ---
 name: check
-description: Reviews the code the user wrote for the current step of the want-to-learn guide and, if it's right, moves on to the next step. Use when the user types /check or says they finished a guide step.
+description: Reviews the code the user wrote for the current step of the wanna-learn guide and, if it's right, moves on to the next step. Use when the user types /check or says they finished a guide step.
 ---
 
 # Check the current step

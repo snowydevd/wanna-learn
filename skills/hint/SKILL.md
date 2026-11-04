@@ -1,6 +1,6 @@
 ---
 name: hint
-description: Gives a hint for the current step of the want-to-learn guide, without giving away the solution. Use when the user types /hint or says they're stuck on a guide step.
+description: Gives a hint for the current step of the wanna-learn guide, without giving away the solution. Use when the user types /hint or says they're stuck on a guide step.
 ---
 
 # Hint for the current step

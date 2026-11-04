@@ -1,6 +1,6 @@
 {
   "name": "want-to-learn",
-  "displayName": "Want to learn",
+  "displayName": "Wanna learn",
   "description": "Step-by-step coding guides with Claude: you write the code, Claude explains, gives hints and reviews it.",
   "version": "0.1.0",
   "publisher": "local",
@@ -18,7 +18,7 @@
       "activitybar": [
         {
           "id": "wantToLearn",
-          "title": "Want to learn",
+          "title": "Wanna learn",
           "icon": "media/icon.svg"
         }
       ]
@@ -33,7 +33,7 @@
       ]
     },
     "configuration": {
-      "title": "Want to learn",
+      "title": "Wanna learn",
       "properties": {
         "wantToLearn.claudePath": {
           "type": "string",

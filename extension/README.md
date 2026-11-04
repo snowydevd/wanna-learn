@@ -1,10 +1,10 @@
-# Want to learn
+# Wanna learn
 
 Learn while you build. Tell Claude what you want to add to your project, and instead of writing it for you, it builds a step-by-step guide. You write the code; Claude explains, gives hints and reviews it before you move on.
 
 ## How it works
 
-1. Open the **Want to learn** panel (graduation cap icon in the activity bar) and describe what you want to build.
+1. Open the **Wanna learn** panel (graduation cap icon in the activity bar) and describe what you want to build.
 2. Claude reads your project and builds a guide of small steps. Each step tells you which file to edit, where, what the code has to achieve, and explains new concepts with links to the official docs.
 3. Write the code yourself. The line where you should write is highlighted in the editor.
 4. Stuck? **💡 Hint** gives a hint that gets more concrete each time you ask, without giving away the solution. **❓ Ask** answers any question about the step.
@@ -28,4 +28,4 @@ Claude replies in the language you write your request in.
 ## Notes
 
 - The guide is saved to `.want-to-learn/guide.json` in the first workspace folder. Add `.want-to-learn/` to your `.gitignore`.
-- The same guide works with the `want-to-learn` Claude Code plugin (`/want-to-learn`, `/hint`, `/check`), so you can switch between the terminal and the panel.
+- The same guide works with the wanna-learn Claude Code plugin (`/want-to-learn`, `/hint`, `/check`), so you can switch between the terminal and the panel.

@@ -119,7 +119,7 @@ function guideView(s: Extract<ViewState, { kind: "guide" }>): string {
 export function renderPanel(s: ViewState): string {
   switch (s.kind) {
     case "no-workspace":
-      return `<div class="empty"><p>Open a project folder to use Want to learn.</p></div>`;
+      return `<div class="empty"><p>Open a project folder to use Wanna learn.</p></div>`;
     case "none":
       return `<div class="empty">
         <h3>What do you want to learn?</h3>
