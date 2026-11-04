@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🎓 want-to-learn
+# 🎓 wanna-learn - This is how AI should be used
 
 **Stop copy-pasting AI code. Learn to write it yourself.**
 
